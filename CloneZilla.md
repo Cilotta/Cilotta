@@ -1,5 +1,5 @@
 本篇为关于clonezilla的使用的说明
-------------------------
+
 # 事前准备
 * 2个移动硬盘(其中一个硬盘需要烧写为CloneZilla启动盘)[CloneZilla下载](https://clonezilla.org/downloads/download.php?branch=stable)
 * 一台可以显示&输入的电脑(NUC+显示器+键盘也可以)
@@ -9,7 +9,6 @@
 * img映像文件来源的电脑的硬盘大小 b
 * b <= a
 
-—-----------------------
 # 备份/还原步骤
 * 仅插入含有CloneZilla的硬盘，电脑进入BIOS通过该盘启动
 * [参照该文章内容备份](https://www.cnblogs.com/linux-37ge/p/12793788.html)
