@@ -1,38 +1,26 @@
 {
   "main": {
-    "id": "69bd1ae0ae08ad33",
+    "id": "8b1108e3a2edb421",
     "type": "split",
     "children": [
       {
-        "id": "0c27ba22ae6e5034",
+        "id": "33928551cb50b8b1",
         "type": "tabs",
         "children": [
           {
-            "id": "b649d60c7d4089fa",
+            "id": "f606f7e54fae7721",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "CloneZilla.md",
+                "file": "Note(ROS->ROS2).md",
                 "mode": "source",
                 "source": false
               }
             }
           },
           {
-            "id": "24c3b8fa73d5131b",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "有助于检测电脑的一些命令行命令.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "15fd8fb129131650",
+            "id": "b2556a7e0dfb012f",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -43,21 +31,22 @@
               }
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
   },
   "left": {
-    "id": "7738e18405da4490",
+    "id": "d61c063c608948c3",
     "type": "split",
     "children": [
       {
-        "id": "d7f344c15f41a041",
+        "id": "e65ae050fb5232f3",
         "type": "tabs",
         "children": [
           {
-            "id": "6df4ceeb84d6e711",
+            "id": "6e4c6ab05dead77d",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -67,7 +56,7 @@
             }
           },
           {
-            "id": "46fd21db1f3586d0",
+            "id": "70a0c2e54b09c7fb",
             "type": "leaf",
             "state": {
               "type": "search",
@@ -82,7 +71,7 @@
             }
           },
           {
-            "id": "2a6ae6e74444b127",
+            "id": "8e6c396f2ffb7b3e",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
@@ -93,24 +82,23 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200,
-    "collapsed": true
+    "width": 200
   },
   "right": {
-    "id": "83c773292a3dd0f3",
+    "id": "8bf0ee2a9a74d551",
     "type": "split",
     "children": [
       {
-        "id": "1e52d0d3965efb15",
+        "id": "02c0f423d4c7b1d0",
         "type": "tabs",
         "children": [
           {
-            "id": "22c6a11e45ec28ad",
+            "id": "4e23c8d91f44a07f",
             "type": "leaf",
             "state": {
               "type": "backlink",
               "state": {
-                "file": "CloneZilla.md",
+                "file": "rm2_controls.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -122,19 +110,19 @@
             }
           },
           {
-            "id": "92a42d29fa17794f",
+            "id": "faa42a93ba97c232",
             "type": "leaf",
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "CloneZilla.md",
+                "file": "rm2_controls.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
             }
           },
           {
-            "id": "64f62a6a9eb18d10",
+            "id": "72dd91b1e65fa72a",
             "type": "leaf",
             "state": {
               "type": "tag",
@@ -145,12 +133,12 @@
             }
           },
           {
-            "id": "d4cbf317ede4326d",
+            "id": "6ef53c312734ad1c",
             "type": "leaf",
             "state": {
               "type": "outline",
               "state": {
-                "file": "CloneZilla.md"
+                "file": "rm2_controls.md"
               }
             }
           }
@@ -171,15 +159,22 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "b649d60c7d4089fa",
+  "active": "b2556a7e0dfb012f",
   "lastOpenFiles": [
-    "Github工作流程.md",
-    "CAN.md",
-    "CloneZilla.md",
+    "Change log of rm2_msgs.md",
+    "Note(ROS->ROS2).md",
+    "notice/Note(ROS->ROS2).md",
+    "未命名",
     "有助于检测电脑的一些命令行命令.md",
+    "Note.md",
+    "inf.txt",
+    "无人机总览.md",
+    "从零开始部署平衡开发环境和仿真（修改版本）.md",
     "rm2_controls.md",
     "README.md",
-    "无人机总览.md",
-    "从零开始部署平衡开发环境和仿真（修改版本）.md"
+    "Github工作流程.md",
+    "CloneZilla.md",
+    "CAN.md",
+    "notice"
   ]
 }

@@ -2,7 +2,7 @@
 本代码基于rm_controls，是它的ros2适配版本，旨在扩展原项目适用的ubuntu版本(support with 22.04+)，以及，为未来可能的比赛方案变化作出预备(如半自动化，集群化等等等等)
 ~~当然还有防止未来的电脑完全不支持安装20.04的情况（比如我的电脑）~~
 # Diffference between ROS & ROS2
-~~等我把那些搬过来先~~
+详情见 Note(ROS->ROS2).md
 # 硬件规格
 CAN-ECat,USB2Can
 GPIO
