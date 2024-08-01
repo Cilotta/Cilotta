@@ -7,7 +7,12 @@
 # 0. What it changes?
 * 1. 不再需要开 ros core ，ros2 是一种去中心化的系统
   tips: 没有 master 了(X)，master被整合到一起不需要特意开了(O)
-* 2. 编译工具再次升级，从 catkin_tools 变成 colcon 
+* 2. 编译工具再次升级，从 ```catkin_tools``` 变成 ```colcon```
+	```
+	用法：
+	colcon build
+	```
+* 3. 编译后的结构改变了
 ```
 sudo apt install python3-colcon-common-extensions
 ### 编译后文件夹结构为：

@@ -25,7 +25,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "rm2_controls.md",
+                "file": "Note(ROS->ROS2).md",
                 "mode": "source",
                 "source": false
               }
@@ -98,7 +98,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "rm2_controls.md",
+                "file": "Note(ROS->ROS2).md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -115,7 +115,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "rm2_controls.md",
+                "file": "Note(ROS->ROS2).md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -138,7 +138,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "rm2_controls.md"
+                "file": "Note(ROS->ROS2).md"
               }
             }
           }
@@ -161,6 +161,7 @@
   },
   "active": "b2556a7e0dfb012f",
   "lastOpenFiles": [
+    "rm2_controls.md",
     "Change log of rm2_msgs.md",
     "Note(ROS->ROS2).md",
     "notice/Note(ROS->ROS2).md",
@@ -170,7 +171,6 @@
     "inf.txt",
     "无人机总览.md",
     "从零开始部署平衡开发环境和仿真（修改版本）.md",
-    "rm2_controls.md",
     "README.md",
     "Github工作流程.md",
     "CloneZilla.md",
