@@ -58,32 +58,32 @@ ROS2 允许使用 set( ) 来快速设置参数
 ## Node
 和 ROS 中相比，有关的命令变化不大，如 node list 等仍然可以使用
 ```
-#ROS
+## ROS ##
 ros::init(argc,argv,"*node name*");
 ros::NodeHandle n;
 ros::Publisher xxx_pub = n.advertise<x_msg::xxx>(xxx,1000);
 ros::Rate loop_rate(10);
 
-#ROS2
+## ROS2 ##
 rclcpp::init(argc,argv);
 auto node = rclcpp::Node::make_shared(*node name*);
 auto xxx_pub = node->create_publisher<x_msg::msg::xxx>(xxx,1000);
 rclcpp::Rate loop_rate(10);
 
-#Time
+## Time ##
 ros::Time -> rclcpp::Time
 std_msgs::Time -> builtin_interface::msg::Time
 
-#TODO :
+## TODO ##:
 话说回来，builtin_interface::msg::Time time和builtin_interface__msg__Time time，这两个time到底有什么区别啊?
 ```
-此外，新增加了一个叫做 LifecycyleNode 的类，允许你控制节点的起停，初始化，ROS1的节点启动是无序且会出现依赖冲突的，ROS2则可以解决这个问题
+此外，新增加了一个叫做 LifecycyleNode 的类，允许你控制节点的起停，初始化，ROS1的节点启动是无序且会出现依赖冲突的，ROS2则可以解决这个问题(想象一下如果roscore寄了能自己重启)
 ## Topic
 同 ROS，Topic 可以实现一对一至多对多通讯
 ==\*.msg 文件编写==
 ```
 msg文件本身并无太大改变，编写方式同ROS
-CMakeList.txt中：
+## CMakeList.txt ##
 	>>> find_package(rosidl_default_generators REQUIRED)
 	+++ rosidl_default_generators(${PROJECT_NAME}
 		## 相关msg文件(需要完整路径，如 msg/xxx.msg )
@@ -93,7 +93,7 @@ CMakeList.txt中：
 		catkin* ,message_generation 不应该再出现
 
 	>>> add_excuteable(#node_name )
-package.xml中：
+## package.xml ##
 	>>> <build_depend>rosidl_default_generator</build_depend>
 	>>> <exec_depend>rosidl_default_runtime</exec_depend>
 	+++ <member_of_group>rosidl_interface_packages</member_of_group> 
@@ -104,12 +104,12 @@ package.xml中：
 ==\*.srv 文件编写==
 ```
 srv文件本身并无太大改变，编写方式同ROS
-CMakeList.txt中：
+## CMakeList.txt ##
 	+++ rosidl_default_generators(${PROJECT_NAME}
 		## 相关srv文件(需要完整路径，如 srv/xxx.srv )
 		)
 	其余同msg编写方式
-package.xml中：
+## package.xml ##
 	同msg编写方式
 ```
 ## Action
@@ -117,14 +117,14 @@ package.xml中：
 ==\*.action 文件编写==
 ```
 action文件本身并无太大改变，编写方式同ROS
-CMakeList.txt中：
+## CMakeList.txt ##
 	+++ rosidl_default_generators(${PROJECT_NAME}
 		## 相关action文件(需要完整路径，如 action/xxx.action)
 		)
 	--- add_action_files()
 		actionlib,actionlib_msgs 不应该再出现
 	其余同msg编写方式
-package.xml中：
+## package.xml ##
 	>>> <buildtool_depend>rosidl_default_generator</buildtool_depend>
 	>>> <depend>action_msgs</depend>
 	其余同msg编写方式 
@@ -156,11 +156,40 @@ package.xml中：
 # 4.Things should TODO in the cpp & hpp
 #1: msg调用改变, ==Before:== geometry::xxx ; ==Now:== geometry::msg::xxx ,此外，#include尽量使用 .hpp 文件，而不是 .h
 
-#2: XmlRpc 是 ROS 的节点通讯方式，其用于辅助节点间建立连接，并由 Master 发布，而 ROS2 选择了 DDS 的通讯方式 ，显而易见，XmlRpc在 ROS2 这个无 Master 的系统之中是无法使用的\
+#2: XmlRpc 是 ROS 的节点通讯方式，其用于辅助节点间建立连接，并由 Master 发布，而 ROS2 选择了 DDS 的通讯方式 ，显而易见，XmlRpc在 ROS2 这个无 Master 的系统之中是无法使用的
+
+# 5.Data transmission
+Files in yaml:
+```
+## ROS ##
+lidar_name: foo
+lidar_id: 10
+ports: [11312, 11311, 21311]
+debug: true
+
+## ROS2 ##
+/lidar_ns:
+  lidar_node_name:
+    ros__parameters:
+      lidar_name: foo
+      id: 10
+/imu:
+  ros__parameters:
+    ports: [2438, 2439, 2440]
+/**:
+  ros__parameters:
+    debug: true
+```
+ROS2 yaml中，参数需要指定需要传参的节点，格式为 /node_name:  ，或者使用 /\*\*: 作为通配符
+
+由于不再有 ros master ，相应地，参数文件服务器也不复存在，各个节点需要自己寻找参数，而非将参数塞到参数服务器再让节点找。找传参和 ROS 也不一致，如ROS2 中节点之间可以共享节点参数，
+
+
+*Hint：你可以自己写一个参数服务器 节点 作为替代，然而，DDS 的通讯方式决定了这样的单点服务器会额外消耗找节点的时间，以及，如果寄了，那就像 ROS 没有core ——完犊子，如果想搞备份服务器，DDS的耗时就再次雪上加霜…这样的性能损耗还会随着节点数量的增加而指数级增长，除非通过[Fast DDS Discovery Server协议](http://dev.ros2.fishros.com/doc/Tutorials/Discovery-Server/Discovery-Server.html)优化发现机制，这样能减缓一点点性能损耗*
 
 # #TODO :
 ## 1: 所有文件内的XmlRpc类需要替代
-暂时不知道怎么改
+XmlRpc用于传参，ROS中使用get_parameter后会得到一个返回值类型为 XmlRpc::XmlRpcValue 的参，一般而言，使用了该种传参方案的都是字典(结构体)，故而不能简单地使用 rclcpp::Parameter 类来替代，gpt给出的参考方案是使用yaml替代，但是yaml需要指定运行节点
 ## 2：rm2_referee内的serial类需要替代
 暂时不知道怎么改
 ## 3: ROS_WARN等数据流需要修改
