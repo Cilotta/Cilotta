@@ -13,7 +13,23 @@
             "state": {
               "type": "markdown",
               "state": {
+<<<<<<< HEAD
                 "file": "rm2_controls.md",
+=======
+                "file": "Note(ROS->ROS2).md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "b2556a7e0dfb012f",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "从零开始部署平衡开发环境和仿真（修改版本）.md",
+>>>>>>> c83a60c090fbd973c48c27cc2c0f3e3ef3561cbe
                 "mode": "source",
                 "source": false
               }
@@ -69,7 +85,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200
+    "width": 200,
+    "collapsed": true
   },
   "right": {
     "id": "8bf0ee2a9a74d551",
@@ -85,7 +102,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "rm2_controls.md",
+                "file": "Note(ROS->ROS2).md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +119,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "rm2_controls.md",
+                "file": "Note(ROS->ROS2).md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +142,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "rm2_controls.md"
+                "file": "Note(ROS->ROS2).md"
               }
             }
           }
@@ -148,6 +165,7 @@
   },
   "active": "f606f7e54fae7721",
   "lastOpenFiles": [
+<<<<<<< HEAD
     "notice/rm2_controls.md",
     "Note(ROS->ROS2).md",
     "无人机总览.md",
@@ -157,6 +175,19 @@
     "rm2_controls.md",
     "README.md",
     "Note.md",
+=======
+    "从零开始部署平衡开发环境和仿真（修改版本）.md",
+    "Note(ROS->ROS2).md",
+    "rm2_controls.md",
+    "README.md",
+    "Note.md",
+    "Change log of rm2_msgs.md",
+    "notice/Note(ROS->ROS2).md",
+    "未命名",
+    "有助于检测电脑的一些命令行命令.md",
+    "inf.txt",
+    "无人机总览.md",
+>>>>>>> c83a60c090fbd973c48c27cc2c0f3e3ef3561cbe
     "Github工作流程.md",
     "CloneZilla.md",
     "Change log of rm2_msgs.md",
