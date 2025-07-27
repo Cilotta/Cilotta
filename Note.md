@@ -1,1 +1,121 @@
-**开始思考** >好的，用户的问题是关于如何将ROS1中的`XmlRpc::XmlRpcValue`用法迁移到ROS2。具体来说，用户提到在ROS1中，他们传入一个`xmlrpc::XmlRpcValue& value`和一个整数`field`，然后使用`value[field].getType()`来获取类型，现在想切换到ROS2。 >首先，我需要回忆一下ROS1和ROS2在参数处理上的差异。根据之前的对话，知道ROS2用`rclcpp::Parameter`替代了ROS1的`XmlRpcValue`。用户的问题涉及到如何访问类似的结构体或数组中的字段，并获取其类型。 >接下来，参考提供的搜索结果。搜索结果[1](@ref)中的用户遇到了类似的问题，在ROS1中使用`XmlRpcValue`读取YAML文件中的数组，而ROS2推荐使用参数回调机制。搜索结果[6](@ref)详细说明了ROS2参数的数据类型，包括`rclcpp::Parameter`支持的类型，如整数数组、布尔数组等。搜索结果[7](@ref)展示了ROS1中`XmlRpcValue`的结构，包括数组和结构体的处理方式，而ROS2中这些可能需要不同的方法处理。 >用户的问题关键点在于如何替换`value[field].getType()`。在ROS1中，`XmlRpcValue`可以是数组或结构体，通过索引或键访问元素，并获取类型。ROS2中，参数系统更严格，参数类型必须在声明时明确，并且不支持结构体参数，需要拆分为多个参数。 >因此，迁移到ROS2时，如果原来是处理数组，可能需要将参数声明为特定类型的数组，例如`std::vector<int64_t>`，然后通过`get_parameter`获取整个数组，再遍历元素。对于结构体，可能需要拆分为多个参数，每个字段单独声明和访问。 >例如，在ROS1中遍历数组的代码需要改为ROS2中获取参数数组，然后遍历其元素。每个元素的类型在声明参数时已经确定，因此不需要像ROS1中那样动态检查类型。如果需要处理不同类型的元素，可能需要使用不同的参数名，或者在YAML文件中组织成多个数组。 >此外，搜索结果[5](@ref)提到ROS2的参数可以通过命令行工具查看和设置，说明参数的类型在声明时必须明确，这也影响了如何在代码中处理这些参数。 >总结，用户需要将ROS1中动态类型检查和结构体/数组访问的方式，改为ROS2中预定义参数类型，使用参数回调，并可能重组参数结构以适应ROS2的类型系统。 **思考结束** ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ 在 ROS 2 中，`XmlRpc::XmlRpcValue` 的功能被 `rclcpp::Parameter` 和 `rcl_interfaces::msg::ParameterValue` 取代。以下是针对 ROS 1 中 `value[field].getType()` 用法的迁移方案： --- ### 1. **类型映射关系** [6](@ref) ROS 2 的参数类型 (`rclcpp::ParameterType`) 与 ROS 1 的 `XmlRpc::XmlRpcValue::Type` 对应关系如下： ### 2. **替代实现方法** [1](@ref)[6](@ref) 在 ROS 2 中，**数组和嵌套结构体参数需通过明确的类型声明和回调机制处理**： #### 2.1 **声明参数** ```cpp // 声明一个整数数组参数（类似 ROS 1 的 XmlRpcValue::TypeArray） this->declare_parameter("my_array", std::vector<int64_t>{1, 2, 3}); ``` #### 2.2 **获取参数值** ```cpp std::vector<int64_t> array_values; this->get_parameter("my_array", array_values); // 直接获取整个数组 ``` #### 2.3 **参数回调（动态响应参数变化）** ```cpp // 设置参数回调函数 param_callback_handle_ = this->add_on_set_parameters_callback( [this](const std::vector<rclcpp::Parameter> &parameters) { rcl_interfaces::msg::SetParametersResult result; result.successful = true; for (const auto &param : parameters) { if (param.get_name() == "my_array") { auto array = param.as_integer_array(); RCLCPP_INFO(this->get_logger(), "Array[0] = %ld", array[0]); } } return result; }); ``` --- ### 3. **处理复杂结构体** [7](@ref) ROS 2 的 `rclcpp::Parameter` **不支持直接映射结构体**（类似 ROS 1 的 `XmlRpcValue::TypeStruct`），需拆分为多个独立参数： #### 3.1 **YAML 文件示例** ```yaml object_0: trajectory: [ [117, 356], [116, 356] ] # 二维数组需拆分为两个独立参数 ``` #### 3.2 **代码实现** ```cpp // 声明独立参数 this->declare_parameter("trajectory_x", std::vector<int64_t>{117, 116}); this->declare_parameter("trajectory_y", std::vector<int64_t>{356, 356}); // 获取参数值 std::vector<int64_t> x_values = this->get_parameter("trajectory_x").as_integer_array(); std::vector<int64_t> y_values = this->get_parameter("trajectory_y").as_integer_array(); ``` --- ### 4. **关键区别总结** | **ROS 1 操作** | **ROS 2 替代方案** | |---------------------------------------|----------------------------------------| | `value[field].getType()` | 通过 `param.get_type()` 获取参数类型 | | `value[field].asInt()` | `param.as_int()` | | `value[field].asString()` | `param.as_string()` | | 动态类型检查（如数组元素类型不固定） | **需预先声明参数类型** [6](@ref) | --- ### 5. **注意事项** [5](@ref) - **类型严格性**：ROS 2 的参数类型必须在声明时明确（如 `std::vector<int64_t>`），不能动态推断。 - **结构体限制**：复杂结构体需拆分为多个参数，或通过自定义消息类型实现。 - **动态回调**：使用 `add_on_set_parameters_callback` 响应参数变化，替代 ROS 1 的动态监听。 如果需要更复杂的嵌套类型，建议使用 ROS 2 的 **服务（Service）** 或 **自定义消息** 实现 [10](@ref)。
+2025/07/08
+
+以下教程将会帮助你在Ubuntu20.04中配置一个ROS和ROS2共存的环境，以便于库的搬运和更新
+
+# 0.版本问题
+不同的Ubuntu各自有着对应的ROS版本，比如:
+ver         ROS        ROS2
+18.04     melodic  
+20.04    noetic      foxy
+22.04    \               humble
+除了22.04后无法安装ROS以外，其余系统都可以安装ROS2，20.04前可以安装ROS，所以目前20.04是最高的双ROS共存版本
+!!!预先用鱼香ros等下载好需要的ROS版本!!!
+# 1.环境配置
+以下是ROS(2)常用的环境：
+```
+ROS_DISTRO         #指明ROS当前版本(如foxy)
+ROS_PACKAGE_PATH   #ROS的安装包路径
+ROS_ROOT           #ROS的根路径
+ROS_PYTHON_VERSION #ROS的Python版本
+AMENT_CMAKE_PATH   #ROS2的Cmake路径
+CATKIN_CMAKE_PATH  #ROS的Cmake路径
+ROS_VERSION        #ROS的版本
+```
+其中
+```
+ROS_DISTRO
+ROS_PACKAGE_PATH
+```
+需要在切换版本时清除
+# 2.脚本参考
+“一山不容二虎”
+版本切换：
+```
+rosver(){
+unset ROS_DISTRO
+unset ROS_PACKAGE_PATH
+case $1 in
+        1)
+                source  /opt/ros/noetic/setup.bash
+                source ~/ROS工作空间/devel/setup.bash;;
+
+        2)
+                source  /opt/ros/foxy/setup.bash
+                source ~/ROS2工作空间/install/setup.bash;;
+
+        *)
+                rosver 1;; #无输入默认ROS1
+esac
+}
+
+#写完之后记得把原来的src删掉
+```
+“编译完之后要多敲代码...”
+快速source .bashrc:
+```
+srcbashs(){
+        rosv=${ROS_DISTRO}
+        source ~/.bashrc
+        if [ $rosv ];then
+                if [ $rosv = foxy ];then rosver 2
+                elif [ $rosv = noetic ];then rosver 1
+                fi
+        elif [[ $1 -eq 1 || $1 -eq 2 ]];then
+                rosver $1
+        fi
+}
+
+useage:
+srcbashs     #如果原本就没有ROS环境，无操作
+srcbashs 1/2 #载入ROS1/2的环境
+srcbashs     #存在ROS环境时，保留原ROS环境继续source
+```
+“我怎么知道我现在在哪个环境里面?”
+改变终端开头提示
+```
+export PS1="\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$" 
+#PS1是你打开终端后前面那一串用户名的环境变量
+#你可以随便在喜欢的地方加上标识(或者直接玩出花来)
+#配合前面的rosver()来改变PS1从而随时看到当前环境
+#最终成果：
+name@user:(ROS Noetic)~$
+```
+# 3.验证
+ROS验证：
+```
+#终端1
+roscore
+#终端2
+rosrun turtlesim turtlesim_node
+#终端3
+rosrun turtlesim draw_square
+
+rostopic echo/pub
+```
+ROS2验证：
+```
+#终端1
+ros2 run turtlesim turtlesim_node
+#终端2
+ros2 run turtlesim draw_square
+
+ros2 topic echo/pub
+```
+这里推荐双开，确保两个ROS是互相分离的，理论上，你应该能看到两个命名都是turtle1的乌龟在不同的窗口上面分别画方框
+# 4.其他问题
+### 1: rqt会开谁的？
+在谁的环境下就会开谁的，不过两者的插件并不互通
+(没错，你会看到ROS2的rqt没有那条could not find roscore了)
+### 2: rviz会开谁的？
+ROS：rviz
+ROS2：rviz2
+注意别敲错了
+### 3: plotjuggler会读谁的？
+ROS: rosrun plotjuggler plotjuggler
+ROS2: ros2 run plotjuggler plotjuggler
+记得先下载对应版本的plotjuggler(算是一种附属包)
+### 4:  gazebo会用谁的？
+ROS Noetic: 支持Gazebo 11.X
+ROS 2 Foxy: 支持Gazebo Citadel
+需要下载两个gazebo
+### 5: #待补充 

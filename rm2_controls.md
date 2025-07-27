@@ -46,10 +46,15 @@ tof_radar       ##雷达
 ## ==rm_ecat==
 包含 Ether-cat 通信相关
 ### rm_ecat_example
+ecat相关例程
 ### rm_ecat_manager
+ecat从站管理层
 ### rm_ecat_msgs
+ecat相关的ros msgs
 ### rm_ecat_ros
-### rm_ecat_slave
+ecat的ros接口
+### rm_ecat_standard_slave/rm_ecat_mit_slave
+ecat从站实现层，分为两种协议，无刷/关节电机
 ## ==rm_forecast==
 包含视觉相关，如打符，自瞄等视觉预测函数
 ## ==rm_manual==
@@ -66,4 +71,3 @@ tof_radar       ##雷达
 # ROS2 编写控制器和插件
 #待补充
 # 其他： #待补充 
-​
