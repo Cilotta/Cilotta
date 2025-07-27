@@ -69,18 +69,23 @@ ros::NodeHandle n;
 ros::Publisher xxx_pub = n.advertise<x_msg::xxx>(xxx,1000);
 ros::Rate loop_rate(10);
 
+xxx_pub.publish(xxx_data);
+
 ## ROS2 ##
 rclcpp::init(argc,argv);
 auto node = rclcpp::Node::make_shared(*node name*);
-auto xxx_pub = node->create_publisher<x_msg::msg::xxx>(xxx,1000);
+auto xxx_pub = node->create_publisher<x_msg::msg::xxx>(xxx,1000); 
+//xxx_pub类型为rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr
 rclcpp::Rate loop_rate(10);
+
+xxx_pub->publish(xxx_data);
 
 ## Time ##
 ros::Time -> rclcpp::Time
 std_msgs::Time -> builtin_interface::msg::Time
 
 ## TODO ##:
-话说回来，builtin_interface::msg::Time time和builtin_interface__msg__Time time，这两个time到底有什么区别啊?
+话说回来，builtin_interface::msg::Time time和builtin_interface__msg__Time time，这两个time到底有什么区别?
 ```
 此外，新增加了一个叫做 LifecycyleNode 的类，允许你控制节点的起停，初始化，ROS1的节点启动是无序且会出现依赖冲突的，ROS2则可以解决这个问题(想象一下如果roscore寄了能自己重启)
 ## Topic
@@ -142,9 +147,9 @@ action文件本身并无太大改变，编写方式同ROS
   pattern 'xxx'
 ```
 #1: 使用你的 IDE，搜索 “time”，在 ros2 中，时间戳被整合到了 builtin_interfaces/Time，因此，原 ROS 中所有使用了时间戳 time 的地方都要修改为 builtin_interfaces/Time  (!大小写区分!)
+
 #2: ROS2 的命名规则现在更严格了，如 bool 值中不能有大写等，用 IDE 搜索并按照报错的 pattern 替换掉相应的命名即可
 # 3.*Change in Interfaces.*
-*catin 已经不复存在，自然，你也不应该再在文件中看到它*
 以下是部分接口的转移：
 - `CATKIN_DEPENDS` 和 `DEPENDS` 的参数被传递给新的函数 [ament_export_dependencies](https://github.com/ament/ament_cmake/blob/master/ament_cmake_export_dependencies/cmake/ament_export_dependencies.cmake) 
 - `CATKIN_GLOBAL_BIN_DESTINATION`: `bin` 
@@ -159,10 +164,24 @@ action文件本身并无太大改变，编写方式同ROS
 *[Check this !](http://dev.ros2.fishros.com/doc/Contributing/Migration-Guide.html)*
 
 # 4.Things should TODO in the cpp & hpp
-#1: msg调用改变, ==Before:== geometry::xxx ; ==Now:== geometry::msg::xxx ,此外，#include尽量使用 .hpp 文件，而不是 .h
-
-#2: XmlRpc 是 ROS 的节点通讯方式，其用于辅助节点间建立连接，并由 Master 发布，而 ROS2 选择了 DDS 的通讯方式 ，显而易见，XmlRpc在 ROS2 这个无 Master 的系统之中是无法使用的
-
+### 1): msg调用改变
+==Before:== geometry::xxx ; ==Now:== geometry::msg::xxx
+此外，#include尽量使用 .hpp 文件(例外的是，所有msg类请全部使用hpp)，而不是 .h
+### 2): XmlRpc类在ROS2中多数采用rclcpp::Parameter代替，以下是详细调换教程：
+- XmlRpc::XmlRpcValue& *name* 替换为 rclcpp::Parameter& *name*
+- XmlRpc相关函数如 “getType()" "getValue()" 等，用 "get_type()" "get_value()"等替换
+- parameter类型需要获取具体数值时请输入 ".as_int()" 等转换形式
+- XmlRpc::XmlRpcValue::*Type* 转换至 rclcpp::Parameter::*Type* 按照下列表格转换
+  |            **ROS 1**            |            **ROS 2**            |
+  |`TypeBoolean`            |`PARAMETER_BOOL`      |
+  |`TypeInt`                   | `PARAMETER_INTEGER` |
+  |`TypeDouble`              |`PARAMETER_DOUBLE` |
+  |`TypeString`              |`PARAMETER_STRING` |
+  |`TypeArray`                |`PARAMETER_INTEGER_ARRAY` 等数组类型|
+  |`TypeStruct`              |不支持直接映射(需拆分为多个参数)|
+- ROS_ASSERT(rpc.hasMember( *name* )) 由新的假定函数替换: nh.declare_parameter( *name* ) ==需要传入node而非rclcpp::Param==
+- 由于参数机制的改变，当你想要查询某个参数时，在ROS2中需要绑定一个node，也就是说==参数和node强相关==
+- 待补充
 # 5.Data transmission
 Files in yaml:
 ```
@@ -191,6 +210,22 @@ ROS2 yaml中，参数需要指定需要传参的节点，格式为 /node_name:  
 
 
 *Hint：你可以自己写一个参数服务器 节点 作为替代，然而，DDS 的通讯方式决定了这样的单点服务器会额外消耗找节点的时间，以及，如果寄了，那就像 ROS 没有core ——完犊子，如果想搞备份服务器，DDS的耗时就再次雪上加霜…这样的性能损耗还会随着节点数量的增加而指数级增长，除非通过[Fast DDS Discovery Server协议](http://dev.ros2.fishros.com/doc/Tutorials/Discovery-Server/Discovery-Server.html)优化发现机制，这样能减缓一点点性能损耗*
+
+# 6.Hardware_Interface Change
+```
+## ROS ##
+# Base
+hardware_interface::RobotHW
+# JointInterface 关节控制
+hardware_interface::JointHandle            # 控制句柄
+hardware_interface::EffortJointInterface   # 力矩
+hardware_interface::VelocityJointInterface # 速度
+hardware_interface::PositionJointInterface # 位置
+
+# 
+## ROS2 ##
+
+```
 
 # #TODO :
 ## 1: 所有文件内的XmlRpc类需要替代
